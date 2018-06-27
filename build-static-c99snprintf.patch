@@ -1,0 +1,11 @@
+--- a/ThirdParty/c99_snprintf/CMakeLists.txt	2018-05-04 09:54:14.000000000 +0200
++++ b/ThirdParty/c99_snprintf/CMakeLists.txt	2018-05-18 10:15:26.174164200 +0200
+@@ -119,7 +119,7 @@
+ 
+ file(WRITE ${CMAKE_BINARY_DIR}/c99snprintf_defs "${DEFINES}")
+ 
+-add_library(c99snprintf c99-snprintf_1.1/snprintf.c)
++add_library(c99snprintf STATIC c99-snprintf_1.1/snprintf.c)
+ 
+ if(CYGWIN) 
+ message("not tested")
