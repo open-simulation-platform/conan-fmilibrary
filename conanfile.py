@@ -4,9 +4,9 @@ from conans import ConanFile, CMake, tools
 class FmilibraryConan(ConanFile):
     name = "FMILibrary"
     version = "2.0.3"
-    license = "<Put the package license here>"
-    url = "<Package recipe repository url here, for issues about the package>"
-    description = "<Description of Fmilibrary here>"
+    license = "https://svn.jmodelica.org/FMILibrary/tags/2.0.3/LICENSE.md"
+    url = "https://github.com/kyllingstad/conan-FMILibrary"
+    description = "An implementation of the FMI standard which enables FMU import in applications"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False]}
     default_options = "shared=False"
