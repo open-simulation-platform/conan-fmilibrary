@@ -11,14 +11,12 @@ class FmilibraryConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = "shared=False"
     generators = "cmake"
+    exports_sources = [ "build-static-c99snprintf.patch" ]
 
     def source(self):
         tools.download("https://jmodelica.org/fmil/FMILibrary-2.0.3-src.zip", "FMILibrary-2.0.3-src.zip")
         tools.unzip("FMILibrary-2.0.3-src.zip")
-        tools.patch(patch_file="build-static-c99snprintf.patch")
-        # This small hack might be useful to guarantee proper /MT /MD linkage
-        # in MSVC if the packaged project doesn't have variables to set it
-        # properly
+        tools.patch(base_path="FMILibrary-2.0.3", patch_file="build-static-c99snprintf.patch")
         tools.replace_in_file("FMILibrary-2.0.3/CMakeLists.txt", "project (FMILibrary)",
                               '''project (FMILibrary)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -39,16 +37,15 @@ conan_basic_setup()''')
 
     def package(self):
         fmilib_install_dir = self.build_folder + "/install"
-        self.copy("*.h", dst="include", src=fmilib_install_dir+"/include")
-        self.copy("fmilib*.lib", dst="lib", keep_path=False)
-        self.copy("*.dll", dst="bin", keep_path=False)
-        self.copy("*.so", dst="lib", keep_path=False)
-        self.copy("*.dylib", dst="lib", keep_path=False)
-        self.copy("*fmilib.a", dst="lib", keep_path=False)
+        self.copy("*.h",    dst="include",  src=fmilib_install_dir+"/include")
+        self.copy("*.dll",  dst="bin",      src=fmilib_install_dir, keep_path=False)
+        self.copy("*.so",   dst="lib",      src=fmilib_install_dir, keep_path=False)
+        self.copy("*.dylib",dst="lib",      src=fmilib_install_dir, keep_path=False)
+        self.copy("*.lib",  dst="lib",      src=fmilib_install_dir, keep_path=False)
+        self.copy("*.a",    dst="lib",      src=fmilib_install_dir, keep_path=False)
 
     def package_info(self):
         if self.options.shared:
             self.cpp_info.libs = ["fmilib_shared"]
         else:
             self.cpp_info.libs = ["fmilib"]
-
