@@ -1,3 +1,7 @@
+The license and copyright notice in this file only apply to the Conan recipe and
+associated files. It does NOT apply to FMI Library itself. For information
+about FMI Library, see: https://github.com/modelon-community/fmi-library
+
 MIT License
 
 Copyright (c) 2020 DNV GL AS, Kongsberg Maritime CM AS, SINTEF Ocean AS, and NTNU
