@@ -47,6 +47,8 @@ conan_basic_setup()''')
         self.copy("*.dylib",dst="lib",      src=fmilib_install_dir, keep_path=False)
         self.copy("*.lib",  dst="lib",      src=fmilib_install_dir, keep_path=False)
         self.copy("*.a",    dst="lib",      src=fmilib_install_dir, keep_path=False)
+        self.copy("LICENSE.md",                  src="src", dst="licenses", keep_path=False)
+        self.copy("FMILIB_Acknowledgements.txt", src="src", dst="licenses", keep_path=False)
 
     def package_info(self):
         if self.options.shared:
