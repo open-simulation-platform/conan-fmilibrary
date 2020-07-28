@@ -23,6 +23,7 @@ jobs:
         build_type: [Debug, Release]
         compiler_version: [7, 8, 9]
         compiler_libcxx: [libstdc++11]
+        option_shared: ['True', 'False']
     steps:
       - uses: actions/checkout@v2
       - name: Install prerequisites
@@ -30,7 +31,7 @@ jobs:
           sudo pip3 install --upgrade setuptools pip
           sudo pip3 install conan
       - run: conan remote add osp https://osp-conan.azurewebsites.net/artifactory/api/conan/public --force
-      - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -s compiler.libcxx=${{ matrix.compiler_libcxx }} . _/_
+      - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -s compiler.libcxx=${{ matrix.compiler_libcxx }} -o fmilibrary:shared=${{ matrix.option_shared }} . _/_
       - run: conan upload --all -c -r osp 'fmilibrary*'
 
   conan-on-windows:
@@ -45,6 +46,7 @@ jobs:
         os: [windows-2016]
         build_type: [Debug, Release]
         compiler_version: [15]
+        option_shared: ['True', 'False']
     steps:
       - uses: actions/checkout@v2
       - name: Install prerequisites
@@ -52,5 +54,5 @@ jobs:
           pip3 install --upgrade setuptools pip
           pip3 install conan
       - run: conan remote add osp https://osp-conan.azurewebsites.net/artifactory/api/conan/public --force
-      - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} . _/_
+      - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -o fmilibrary:shared=${{ matrix.option_shared }} . _/_
       - run: conan upload --all -c -r osp 'fmilibrary*'
