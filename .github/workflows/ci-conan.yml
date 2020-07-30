@@ -4,8 +4,8 @@ name: conan-fmilibrary CI Conan
 on: [push]
 
 env:
-  CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_conan_usr }}
-  CONAN_PASSWORD_OSP: ${{ secrets.osp_conan_pwd }}
+  CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
+  CONAN_PASSWORD_OSP: ${{ secrets.osp_artifactory_pwd }}
   CONAN_REVISIONS_ENABLED: 1
   CONAN_NON_INTERACTIVE: True
 
@@ -29,7 +29,7 @@ jobs:
         run: |
           sudo pip3 install --upgrade setuptools pip
           sudo pip3 install conan
-      - run: conan remote add osp https://osp-conan.azurewebsites.net/artifactory/api/conan/public --force
+      - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan --force
       - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -s compiler.libcxx=${{ matrix.compiler_libcxx }} . _/_
       - run: conan upload --all -c -r osp 'fmilibrary*'
 
@@ -51,6 +51,6 @@ jobs:
         run: |
           pip3 install --upgrade setuptools pip
           pip3 install conan
-      - run: conan remote add osp https://osp-conan.azurewebsites.net/artifactory/api/conan/public --force
+      - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan --force
       - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} . _/_
       - run: conan upload --all -c -r osp 'fmilibrary*'
