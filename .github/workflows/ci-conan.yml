@@ -30,7 +30,7 @@ jobs:
         run: |
           sudo pip3 install --upgrade setuptools pip
           sudo pip3 install conan
-      - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-public --force
+      - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -s compiler.libcxx=${{ matrix.compiler_libcxx }} -o fmilibrary:shared=${{ matrix.option_shared }} . _/_
       - run: conan upload --all -c -r osp 'fmilibrary*'
 
@@ -53,6 +53,6 @@ jobs:
         run: |
           pip3 install --upgrade setuptools pip
           pip3 install conan
-      - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-public --force
+      - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -o fmilibrary:shared=${{ matrix.option_shared }} . _/_
       - run: conan upload --all -c -r osp 'fmilibrary*'
