@@ -3,8 +3,8 @@ from conans import ConanFile, CMake, tools
 
 class FMILibraryConan(ConanFile):
     name = "fmilibrary"
-    version = "2.0.3"
-    license = "https://svn.jmodelica.org/FMILibrary/tags/2.0.3/LICENSE.md"
+    version = "2.3"
+    license = "https://github.com/modelon-community/fmi-library/blob/master/LICENSE.md"
     url = "https://github.com/kyllingstad/conan-FMILibrary"
     description = "An implementation of the FMI standard which enables FMU import in applications"
     scm = {
