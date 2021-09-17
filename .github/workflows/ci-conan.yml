@@ -44,9 +44,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2016]
+        os: [windows-2016, windows-2019]
         build_type: [Debug, Release]
-        compiler_version: [15]
         option_shared: ['True', 'False']
     steps:
       - uses: actions/checkout@v2
@@ -55,5 +54,5 @@ jobs:
           pip3 install --upgrade setuptools pip
           pip3 install conan
       - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -o fmilibrary:shared=${{ matrix.option_shared }} . _/_
+      - run: conan create -s build_type=${{ matrix.build_type }} -o fmilibrary:shared=${{ matrix.option_shared }} . _/_
       - run: conan upload --all -c -r osp 'fmilibrary*'
