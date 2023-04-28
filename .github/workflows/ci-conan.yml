@@ -19,9 +19,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-latest]
         build_type: [Debug, Release]
-        compiler_version: [7, 8, 9]
+        compiler_version: [9]
         compiler_libcxx: [libstdc++11]
         option_shared: ['True', 'False']
     steps:
@@ -32,7 +32,7 @@ jobs:
           sudo pip3 install --upgrade setuptools pip
           sudo pip3 install conan
       - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -s compiler.libcxx=${{ matrix.compiler_libcxx }} -o fmilibrary:shared=${{ matrix.option_shared }} . _/_
+      - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -s compiler.libcxx=${{ matrix.compiler_libcxx }} -o fmilibrary/*:shared=${{ matrix.option_shared }} .
       - run: conan upload --all -c -r osp 'fmilibrary*'
 
   conan-on-windows:
@@ -54,5 +54,5 @@ jobs:
           pip3 install --upgrade setuptools pip
           pip3 install conan
       - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - run: conan create -s build_type=${{ matrix.build_type }} -o fmilibrary:shared=${{ matrix.option_shared }} . _/_
+      - run: conan create -s build_type=${{ matrix.build_type }} -o fmilibrary/*:shared=${{ matrix.option_shared }} .
       - run: conan upload --all -c -r osp 'fmilibrary*'

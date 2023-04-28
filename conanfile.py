@@ -46,6 +46,7 @@ class FMILibraryConan(ConanFile):
         cmake = CMake(self)
         cmake.install()
         copy(self, "*.dll", os.path.join(self.build_folder, "Debug"), os.path.join(self.package_folder, "bin"))
+        copy(self, "*.dll", os.path.join(self.build_folder, "Release"), os.path.join(self.package_folder, "bin"))
 
     def package_info(self):
         if self.options.shared:
