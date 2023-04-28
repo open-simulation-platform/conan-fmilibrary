@@ -34,7 +34,7 @@ jobs:
       - run: conan profile detect
       - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -s compiler.libcxx=${{ matrix.compiler_libcxx }} -o fmilibrary/*:shared=${{ matrix.option_shared }} .
-      - run: conan upload --all -c -r osp 'fmilibrary*'
+      - run: conan upload -c -r osp 'fmilibrary*'
 
   conan-on-windows:
     name: Conan
@@ -57,4 +57,4 @@ jobs:
       - run: conan profile detect
       - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - run: conan create -s build_type=${{ matrix.build_type }} -o fmilibrary/*:shared=${{ matrix.option_shared }} .
-      - run: conan upload --all -c -r osp 'fmilibrary*'
+      - run: conan upload -c -r osp 'fmilibrary*'
