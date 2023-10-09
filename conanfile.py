@@ -17,6 +17,7 @@ class FMILibraryConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = {"shared": False}
 
+    tool_requires = "cmake/[>=3.15]"
     generators = "CMakeDeps"
 
     exports_sources = "build-static-c99snprintf.patch"
@@ -31,9 +32,10 @@ class FMILibraryConan(ConanFile):
 
     def generate(self):       
         tc = CMakeToolchain(self)
-        tc.cache_variables["FMILIB_BUILD_STATIC_LIB"] = False if self.options.shared else True
-        tc.cache_variables["FMILIB_BUILD_SHARED_LIB"] = True if self.options.shared else False
+        tc.cache_variables["FMILIB_BUILD_STATIC_LIB"] = not self.options.shared
+        tc.cache_variables["FMILIB_BUILD_SHARED_LIB"] = not not self.options.shared
         tc.cache_variables["FMILIB_BUILD_TESTS"] = False
+        tc.cache_variables["FMILIB_GENERATE_DOXYGEN_DOC"] = False
         tc.cache_variables["FMILIB_INSTALL_PREFIX"] = pathlib.Path(os.path.join(self.build_folder, "install")).as_posix()
         tc.generate()
     
