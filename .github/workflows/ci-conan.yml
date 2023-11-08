@@ -3,19 +3,10 @@ name: conan-fmilibrary CI Conan
 # This workflow is triggered on pushes to the repository.
 on: [push, workflow_dispatch]
 
-env:
-  CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
-  CONAN_PASSWORD_OSP: ${{ secrets.osp_artifactory_pwd }}
-  CONAN_REVISIONS_ENABLED: 1
-  CONAN_NON_INTERACTIVE: True
-
 jobs:
   conan-on-linux:
     name: Conan
     runs-on: ubuntu-latest
-    env:
-      CC: gcc-${{ matrix.compiler_version }}
-      CXX: g++-${{ matrix.compiler_version }}
     strategy:
       fail-fast: false
       matrix:
@@ -43,15 +34,7 @@ jobs:
           set -eu
           cd /mnt/source
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-          REFNAME="${GITHUB_REF#refs/*/}"
-          VERSION="v$(<version.txt)"
-          if [[ $GITHUB_REF == refs/tags/* ]] && [[ $REFNAME == $VERSION ]]; then CHANNEL="stable"
-          elif [[ $REFNAME == master ]]; then CHANNEL="testing"
-          else
-            SHORT_REFNAME="${REFNAME:0:40}"
-            CHANNEL="testing-${SHORT_REFNAME//\//_}"
-          fi
-          conan create -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 -o "libcosim/*:${{ matrix.option_shared }}" -b missing . --user=osp --channel=${CHANNEL}
+          conan create -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 -o "libcosim/*:${{ matrix.option_shared }}" -b missing .
           conan upload --confirm --remote=osp 'fmilibrary*'
           EOF
           chmod 0755 /tmp/osp-builder-docker/entrypoint.sh
