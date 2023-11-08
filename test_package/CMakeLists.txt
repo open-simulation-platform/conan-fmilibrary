@@ -4,4 +4,4 @@ project(PackageTest CXX)
 find_package(fmilibrary CONFIG REQUIRED)
 
 add_executable(test test.cpp)
-target_link_libraries(test fmilibrary::fmilibrary)
+target_link_libraries(test fmilibrary::fmilibrary ${CMAKE_DL_LIBS})
