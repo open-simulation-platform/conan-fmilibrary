@@ -36,7 +36,7 @@ jobs:
           cd build
           conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
           conan create -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 -o "libcosim/*:${{ matrix.option_shared }}" -b missing .
-          conan upload --confirm --remote=osp 'fmilibrary*'
+          conan upload --confirm --force --remote=osp 'fmilibrary*'
           EOF
           chmod 0755 /tmp/osp-builder-docker/entrypoint.sh
       - name: Build Docker image
@@ -69,4 +69,4 @@ jobs:
       - run: conan profile detect
       - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - run: conan create -s build_type=${{ matrix.build_type }} -o fmilibrary/*:${{ matrix.option_shared }} .
-      - run: conan upload -c -r osp 'fmilibrary*'
+      - run: conan upload --confirm --force --remote=osp 'fmilibrary*'
