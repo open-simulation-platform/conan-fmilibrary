@@ -3,42 +3,55 @@ name: conan-fmilibrary CI Conan
 # This workflow is triggered on pushes to the repository.
 on: [push, workflow_dispatch]
 
-env:
-  CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
-  CONAN_PASSWORD_OSP: ${{ secrets.osp_artifactory_pwd }}
-  CONAN_REVISIONS_ENABLED: 1
-  CONAN_NON_INTERACTIVE: True
-
 jobs:
   conan-on-linux:
     name: Conan
-    runs-on: ${{ matrix.os }}
-    env:
-      CC: gcc-${{ matrix.compiler_version }}
-      CXX: g++-${{ matrix.compiler_version }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04]
         build_type: [Debug, Release]
-        compiler_version: [7, 8, 9]
-        compiler_libcxx: [libstdc++11]
-        option_shared: ['True', 'False']
+        compiler_version: [9]
+        option_shared: ['shared=True', 'shared=False']
     steps:
-      - uses: actions/checkout@v2
-      - name: Install prerequisites
+      - uses: actions/checkout@v3
+      - name: Generate Dockerfile
         run: |
-          sudo apt-get install -y --no-install-recommends g++-8
-          sudo pip3 install --upgrade setuptools pip
-          sudo pip3 install conan
-      - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.version=${{ matrix.compiler_version }} -s compiler.libcxx=${{ matrix.compiler_libcxx }} -o fmilibrary:shared=${{ matrix.option_shared }} . _/_
-      - run: conan upload --all -c -r osp 'fmilibrary*'
+          mkdir /tmp/osp-builder-docker
+          cat <<'EOF' >/tmp/osp-builder-docker/Dockerfile
+          FROM conanio/gcc${{ matrix.compiler_version }}-ubuntu16.04
+          ENV CONAN_LOGIN_USERNAME_OSP=${{ secrets.osp_artifactory_usr }}
+          ENV CONAN_PASSWORD_OSP=${{ secrets.osp_artifactory_pwd }}
+          ENV CONAN_REVISIONS_ENABLED=1
+          ENV CONAN_NON_INTERACTIVE=1
+          COPY entrypoint.sh /
+          ENTRYPOINT /entrypoint.sh
+          EOF
+      - name: Generate entrypoint.sh
+        run: |
+          cat <<'EOF' >/tmp/osp-builder-docker/entrypoint.sh
+          #!/bin/bash -v
+          set -eu
+          cp -r /mnt/source build
+          cd build
+          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+          conan create -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 -o "fmilibrary/*:${{ matrix.option_shared }}" .
+          conan upload --confirm --force --remote=osp 'fmilibrary*'
+          EOF
+          chmod 0755 /tmp/osp-builder-docker/entrypoint.sh
+      - name: Build Docker image
+        run: docker build -t osp-builder /tmp/osp-builder-docker/
+      - name: Build FMI Library
+        run: docker run --rm --env GITHUB_REF="$GITHUB_REF" -v $(pwd):/mnt/source:ro osp-builder
 
   conan-on-windows:
     name: Conan
     runs-on: ${{ matrix.os }}
     env:
+      CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
+      CONAN_PASSWORD_OSP: ${{ secrets.osp_artifactory_pwd }}
+      CONAN_REVISIONS_ENABLED: 1
+      CONAN_NON_INTERACTIVE: True
       CONAN_USER_HOME_SHORT: C:\c
       CONAN_USE_ALWAYS_SHORT_PATHS: 1
     strategy:
@@ -46,13 +59,14 @@ jobs:
       matrix:
         os: [windows-2019, windows-2022]
         build_type: [Debug, Release]
-        option_shared: ['True', 'False']
+        option_shared: ['shared=True', 'shared=False']
     steps:
       - uses: actions/checkout@v2
       - name: Install prerequisites
         run: |
           pip3 install --upgrade setuptools pip
           pip3 install conan
+      - run: conan profile detect
       - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-      - run: conan create -s build_type=${{ matrix.build_type }} -o fmilibrary:shared=${{ matrix.option_shared }} . _/_
-      - run: conan upload --all -c -r osp 'fmilibrary*'
+      - run: conan create -s build_type=${{ matrix.build_type }} -o fmilibrary/*:${{ matrix.option_shared }} .
+      - run: conan upload --confirm --force --remote=osp 'fmilibrary*'
