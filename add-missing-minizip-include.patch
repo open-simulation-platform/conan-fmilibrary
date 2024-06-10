@@ -1,0 +1,12 @@
+diff --git a/ThirdParty/Minizip/minizip/miniunz.c b/ThirdParty/Minizip/minizip/miniunz.c
+index 2264705..9d2130c 100644
+--- a/ThirdParty/Minizip/minizip/miniunz.c
++++ b/ThirdParty/Minizip/minizip/miniunz.c
+@@ -51,6 +51,7 @@
+ # include <direct.h>
+ # include <io.h>
+ #else
++# include <sys/stat.h>
+ # include <unistd.h>
+ # include <utime.h>
+ #endif
