@@ -1,0 +1,23 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9efaa70..82739ab 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,7 +14,7 @@
+ # NOTE: CMake 2.8.6 is required since this is the version used in development.
+ # The script is KNOWN NOT TO WORK WITH 2.8.3 and below (ExternalProject 
+ # interface changes). CMake 2.8.4 and 2.8.5 are not tested.
+-cmake_minimum_required (VERSION 2.8.6 FATAL_ERROR)
++cmake_minimum_required (VERSION 3.5 FATAL_ERROR)
+ 
+ # Prohibit in-source build
+ IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+diff --git a/Config.cmake/Minizip/CMakeLists.txt b/Config.cmake/Minizip/CMakeLists.txt
+index 9452915..d7c5d35 100644
+--- a/Config.cmake/Minizip/CMakeLists.txt
++++ b/Config.cmake/Minizip/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.5)
+ 
+ project(minizip C)
+ 

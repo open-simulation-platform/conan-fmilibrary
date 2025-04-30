@@ -23,6 +23,7 @@ class FMILibraryConan(ConanFile):
     exports_sources = [
         "add-missing-minizip-include.patch",
         "build-static-c99snprintf.patch",
+        "cmake_minimum.patch",
     ]
 
     def source(self):
@@ -30,6 +31,7 @@ class FMILibraryConan(ConanFile):
         git.clone(url="https://github.com/modelon-community/fmi-library.git", target="src", args=["--branch=2.3"])
         patch(self, base_path="src", patch_file="add-missing-minizip-include.patch")
         patch(self, base_path="src", patch_file="build-static-c99snprintf.patch")
+        patch(self, base_path="src", patch_file="cmake_minimum.patch")
 
     def layout(self):
         cmake_layout(self)
