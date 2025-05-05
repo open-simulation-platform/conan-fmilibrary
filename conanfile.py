@@ -17,7 +17,7 @@ class FMILibraryConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = {"shared": False}
 
-    tool_requires = "cmake/[>=3.15]"
+    tool_requires = "cmake/[>=3.15 <4.0]"
     generators = "CMakeDeps"
 
     exports_sources = [
