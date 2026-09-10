@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         build_type: [Debug, Release]
-        compiler_version: [9]
+        compiler_version: [14]
         option_shared: ['shared=True', 'shared=False']
     steps:
       - uses: actions/checkout@v3
