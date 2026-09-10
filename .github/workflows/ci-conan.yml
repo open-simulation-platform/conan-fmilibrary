@@ -29,12 +29,10 @@ jobs:
           pipx install cmake
           pipx install conan
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-      - name: Build and upload FMI Library
-        run: |
-          conan profile detect
-          conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
-          conan create -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 -o "fmilibrary/*:${{ matrix.option_shared }}" .
-          conan upload --confirm --force --remote=osp 'fmilibrary*'
+      - run: conan profile detect
+      - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+      - run: conan create -s build_type=${{ matrix.build_type }} -s compiler.libcxx=libstdc++11 -o "fmilibrary/*:${{ matrix.option_shared }}" .
+      - run: conan upload --confirm --force --remote=osp 'fmilibrary*'
 
   conan-on-windows:
     name: Conan
