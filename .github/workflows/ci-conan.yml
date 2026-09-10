@@ -25,8 +25,10 @@ jobs:
       - name: Install prerequisites
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends python3-pip
-          python3 -m pip install --break-system-packages conan
+          apt-get install -y --no-install-recommends pipx
+          pipx install cmake
+          pipx install conan
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Build and upload FMI Library
         run: |
           conan profile detect
