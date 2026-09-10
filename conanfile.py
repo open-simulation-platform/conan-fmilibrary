@@ -8,7 +8,7 @@ from conan.tools.scm import Git
 
 class FMILibraryConan(ConanFile):
     name = "fmilibrary"
-    version = "2.3"
+    version = "3.0.4"
     license = "https://github.com/modelon-community/fmi-library/blob/master/LICENSE.md"
     url = "https://github.com/open-simulation-platform/conan-fmilibrary"
     description = "An implementation of the FMI standard which enables FMU import in applications"
@@ -17,19 +17,12 @@ class FMILibraryConan(ConanFile):
     options = {"shared": [True, False]}
     default_options = {"shared": False}
 
-    tool_requires = "cmake/[>=3.15 <4.0]"
+    tool_requires = "cmake/[>=3.15]"
     generators = "CMakeDeps"
-
-    exports_sources = [
-        "add-missing-minizip-include.patch",
-        "build-static-c99snprintf.patch",
-    ]
 
     def source(self):
         git = Git(self)
-        git.clone(url="https://github.com/modelon-community/fmi-library.git", target="src", args=["--branch=2.3"])
-        patch(self, base_path="src", patch_file="add-missing-minizip-include.patch")
-        patch(self, base_path="src", patch_file="build-static-c99snprintf.patch")
+        git.clone(url="https://github.com/modelon-community/fmi-library.git", target="src", args=["--branch=3.0.4"])
 
     def layout(self):
         cmake_layout(self)
@@ -58,3 +51,5 @@ class FMILibraryConan(ConanFile):
             self.cpp_info.libs = ["fmilib_shared"]
         else:
             self.cpp_info.libs = ["fmilib"]
+        if self.settings.os == "Windows":
+            self.cpp_info.system_libs = ["shlwapi"]
