@@ -6,9 +6,9 @@ on: [push, workflow_dispatch]
 jobs:
   conan-on-linux:
     name: Conan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
-      image: docker.io/gcc:${{ matrix.compiler_version }}-bookworm
+      image: docker.io/gcc:${{ matrix.compiler_version }}-trixie
     env:
       CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
       CONAN_PASSWORD_OSP: ${{ secrets.osp_artifactory_pwd }}
@@ -21,7 +21,7 @@ jobs:
         compiler_version: [14]
         option_shared: ['shared=True', 'shared=False']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Install prerequisites
         run: |
           apt-get update
@@ -51,7 +51,7 @@ jobs:
         build_type: [Debug, Release]
         option_shared: ['shared=True', 'shared=False']
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
       - name: Install prerequisites
         run: |
           pip3 install --upgrade setuptools pip
