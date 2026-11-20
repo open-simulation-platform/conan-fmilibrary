@@ -6,7 +6,7 @@ on: [push, workflow_dispatch]
 jobs:
   conan-on-linux:
     name: Conan
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
     container:
       image: docker.io/gcc:${{ matrix.compiler_version }}-trixie
     env:
@@ -17,6 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
         build_type: [Debug, Release]
         compiler_version: [14]
         option_shared: ['shared=True', 'shared=False']

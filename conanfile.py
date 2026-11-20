@@ -36,11 +36,13 @@ class FMILibraryConan(ConanFile):
         tc.cache_variables["FMILIB_BUILD_TESTS"] = False
         tc.cache_variables["FMILIB_GENERATE_DOXYGEN_DOC"] = False
         tc.cache_variables["FMILIB_INSTALL_PREFIX"] = pathlib.Path(os.path.join(self.build_folder, "install")).as_posix()
-        if self.settings.os == "Macos" and self.settings.arch == "armv8":
-            # FMI 2.0.4 reserves "darwin64" for 64-bit x86, and other platforms
-            # use the FMI 3 platform tuple. fmi-library derives the FMI 2
-            # folder from the pointer size only, so it would look in darwin64.
-            tc.cache_variables["FMILIB_FMI2_PLATFORM"] = "aarch64-darwin"
+        if self.settings.arch == "armv8" and self.settings.os in ("Macos", "Linux"):
+            # FMI 2.0.4 reserves "darwin64" and "linux64" for 64-bit x86, and
+            # other platforms use the FMI 3 platform tuple. fmi-library derives
+            # the FMI 2 folder from the pointer size only, so it would look in
+            # darwin64 or linux64.
+            tc.cache_variables["FMILIB_FMI2_PLATFORM"] = (
+                "aarch64-darwin" if self.settings.os == "Macos" else "aarch64-linux")
         tc.generate()
 
         if self.settings.os == "Macos":
