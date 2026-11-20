@@ -1,7 +1,9 @@
 import os, pathlib
 
 from conan import ConanFile
+from conan.tools.apple import to_apple_arch
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.env import Environment
 from conan.tools.files import patch, copy
 from conan.tools.scm import Git
 
@@ -34,7 +36,21 @@ class FMILibraryConan(ConanFile):
         tc.cache_variables["FMILIB_BUILD_TESTS"] = False
         tc.cache_variables["FMILIB_GENERATE_DOXYGEN_DOC"] = False
         tc.cache_variables["FMILIB_INSTALL_PREFIX"] = pathlib.Path(os.path.join(self.build_folder, "install")).as_posix()
+        if self.settings.os == "Macos" and self.settings.arch == "armv8":
+            # FMI 2.0.4 reserves "darwin64" for 64-bit x86, and other platforms
+            # use the FMI 3 platform tuple. fmi-library derives the FMI 2
+            # folder from the pointer size only, so it would look in darwin64.
+            tc.cache_variables["FMILIB_FMI2_PLATFORM"] = "aarch64-darwin"
         tc.generate()
+
+        if self.settings.os == "Macos":
+            # fmi-library builds its bundled zlib and expat as external
+            # projects, which do not see our toolchain file. They do pick up
+            # the target architecture from the environment, though, and
+            # without it they are built for the host when cross-compiling.
+            env = Environment()
+            env.define("CMAKE_OSX_ARCHITECTURES", to_apple_arch(self))
+            env.vars(self).save_script("conanbuild_osx_architectures")
     
     def build(self):
         cmake = CMake(self)

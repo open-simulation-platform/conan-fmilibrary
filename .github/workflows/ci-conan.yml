@@ -6,9 +6,9 @@ on: [push, workflow_dispatch]
 jobs:
   conan-on-linux:
     name: Conan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
-      image: docker.io/gcc:${{ matrix.compiler_version }}-bookworm
+      image: docker.io/gcc:${{ matrix.compiler_version }}-trixie
     env:
       CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
       CONAN_PASSWORD_OSP: ${{ secrets.osp_artifactory_pwd }}
@@ -21,7 +21,7 @@ jobs:
         compiler_version: [14]
         option_shared: ['shared=True', 'shared=False']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Install prerequisites
         run: |
           apt-get update
@@ -51,7 +51,7 @@ jobs:
         build_type: [Debug, Release]
         option_shared: ['shared=True', 'shared=False']
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
       - name: Install prerequisites
         run: |
           pip3 install --upgrade setuptools pip
@@ -59,4 +59,36 @@ jobs:
       - run: conan profile detect
       - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
       - run: conan create -s build_type=${{ matrix.build_type }} -o fmilibrary/*:${{ matrix.option_shared }} .
+      - run: conan upload --confirm --force --remote=osp 'fmilibrary*'
+
+  conan-on-macos:
+    name: Conan
+    runs-on: ${{ matrix.os }}
+    env:
+      CONAN_LOGIN_USERNAME_OSP: ${{ secrets.osp_artifactory_usr }}
+      CONAN_PASSWORD_OSP: ${{ secrets.osp_artifactory_pwd }}
+      CONAN_REVISIONS_ENABLED: 1
+      CONAN_NON_INTERACTIVE: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15]
+        arch: [armv8, x86_64]
+        build_type: [Debug, Release]
+        option_shared: ['shared=True', 'shared=False']
+        exclude:
+          # x86_64 is legacy on macOS, so only build it in Release
+          - arch: x86_64
+            build_type: Debug
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Rosetta
+        if: matrix.arch == 'x86_64'
+        run: /usr/bin/pgrep -q oahd || sudo softwareupdate --install-rosetta --agree-to-license
+      - name: Install prerequisites
+        run: pipx install conan
+      - run: conan profile detect
+      - run: conan remote add osp https://osp.jfrog.io/artifactory/api/conan/conan-local --force
+      # x86_64 counts as cross-building on these runners, but it runs under Rosetta
+      - run: conan create -s:h arch=${{ matrix.arch }} -c tools.build.cross_building:can_run=True -s build_type=${{ matrix.build_type }} -o "fmilibrary/*:${{ matrix.option_shared }}" .
       - run: conan upload --confirm --force --remote=osp 'fmilibrary*'
